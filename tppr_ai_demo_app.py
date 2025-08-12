@@ -21,7 +21,6 @@ _Developed for innovation competitions to showcase AI integration in industrial 
 
 # --- Live AI Alert Panel ---
 import numpy as np
-else:
     alert_placeholder.success('✅ All clear: Gas levels within safe range.')
 
 import pandas as pd
@@ -45,7 +44,6 @@ alert_placeholder = st.empty()
 import numpy as np
 if (latest_readings.select_dtypes(include=[np.number]) > danger_threshold).any().any():
     alert_placeholder.error(f'🚨 **DANGER:** High gas levels detected! Above {danger_threshold} ppm. Immediate action required!')
-else:
     alert_placeholder.success(f'✅ All clear: Gas levels within safe range (≤ {danger_threshold} ppm).')
 
 # --- Alert History Sidebar ---
@@ -55,7 +53,6 @@ if 'alert_history' not in st.session_state:
 latest_time = latest_readings['timestamp'].iloc[0] if 'timestamp' in latest_readings else 'Unknown time'
 if (latest_readings.select_dtypes(include=[np.number]) > danger_threshold).any().any():
     st.session_state.alert_history.append(f"🚨 Danger at {latest_time} — Gas above {danger_threshold} ppm")
-else:
     st.session_state.alert_history.append(f"✅ Safe at {latest_time} — Gas within safe range")
 
 st.sidebar.title('Alert History')
@@ -218,13 +215,11 @@ def render_at_index(idx):
     if ai_alerts:
         alerts_df = pd.DataFrame(ai_alerts).sort_values("urgency", ascending=False)
         alert_table.table(alerts_df[['channel','gas','latest_ppm','zscore','minutes_to_threshold','urgency']])
-    else:
         alert_table.markdown("**No AI alerts** — system nominal.")
 
     if tppr_alarm_rows:
         tppr_df = pd.DataFrame(tppr_alarm_rows, columns=["channel","timestamp","ppm"])
         status_box.table(tppr_df)
-    else:
         status_box.markdown("**No TPPR alarms have occurred yet.**")
 
 # Main loop control
@@ -239,7 +234,6 @@ if play:
         # allow manual break
         if not st.checkbox("Keep Playing (uncheck to stop)", value=True, key=f"playchk_{i}"):
             break
-else:
     # show current snapshot at st.session_state.pos
     render_at_index(st.session_state.pos)
     # allow stepping
@@ -259,7 +253,6 @@ if 'alert_history' not in st.session_state:
 latest_time = latest_readings['timestamp'].iloc[0] if 'timestamp' in latest_readings else 'Unknown time'
 if (latest_readings.select_dtypes(include=[np.number]) > danger_threshold).any().any():
     st.session_state.alert_history.append(f"🚨 Danger at {latest_time} — Gas above {danger_threshold} ppm")
-else:
     st.session_state.alert_history.append(f"✅ Safe at {latest_time} — Gas within safe range")
 
 st.sidebar.title('Alert History')
