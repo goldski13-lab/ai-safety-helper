@@ -17,11 +17,7 @@ _Developed for innovation competitions to showcase AI integration in industrial 
 
 # --- Live AI Alert Panel ---
 import numpy as np
-latest_readings = df.tail(1)
-alert_placeholder = st.empty()
-danger_threshold = st.slider('Set danger threshold (ppm):', min_value=0, max_value=200, value=50, step=1)
-if (latest_readings.select_dtypes(include=[np.number]) > danger_threshold).any().any():
-    alert_placeholder.error('🚨 **DANGER:** High gas levels detected! Immediate action required!')
+# AI alert block moved down
 else:
     alert_placeholder.success('✅ All clear: Gas levels within safe range.')
 
@@ -38,6 +34,11 @@ csv_path = os.path.join(os.path.dirname(__file__), "tppr_simulated.csv")
 if not os.path.exists(csv_path):
     raise FileNotFoundError(f"CSV file not found at {csv_path}")
 df = pd.read_csv(csv_path, parse_dates=["timestamp"])
+latest_readings = df.tail(1)
+alert_placeholder = st.empty()
+danger_threshold = st.slider('Set danger threshold (ppm):', min_value=0, max_value=200, value=50, step=1)
+if (latest_readings.select_dtypes(include=[np.number]) > danger_threshold).any().any():
+    alert_placeholder.error('🚨 **DANGER:** High gas levels detected! Immediate action required!')
 
 st.set_page_config(page_title="TPPR AI Demo", layout="wide")
 
