@@ -1,5 +1,9 @@
 
 import streamlit as st
+from streamlit_autorefresh import st_autorefresh
+
+# Auto-refresh every 5 seconds
+st_autorefresh(interval=5000, key='refresh')
 
 # --- Competition Welcome Banner ---
 st.set_page_config(page_title='TPPR AI Safety Assistant', layout='wide')
@@ -17,7 +21,6 @@ _Developed for innovation competitions to showcase AI integration in industrial 
 
 # --- Live AI Alert Panel ---
 import numpy as np
-# AI alert block moved down
 else:
     alert_placeholder.success('✅ All clear: Gas levels within safe range.')
 
@@ -34,11 +37,31 @@ csv_path = os.path.join(os.path.dirname(__file__), "tppr_simulated.csv")
 if not os.path.exists(csv_path):
     raise FileNotFoundError(f"CSV file not found at {csv_path}")
 df = pd.read_csv(csv_path, parse_dates=["timestamp"])
+
+# --- Live AI Alert Panel with Slider ---
+danger_threshold = st.slider('Set danger threshold (ppm):', min_value=0, max_value=200, value=50, step=1)
 latest_readings = df.tail(1)
 alert_placeholder = st.empty()
-danger_threshold = st.slider('Set danger threshold (ppm):', min_value=0, max_value=200, value=50, step=1)
+import numpy as np
 if (latest_readings.select_dtypes(include=[np.number]) > danger_threshold).any().any():
-    alert_placeholder.error('🚨 **DANGER:** High gas levels detected! Immediate action required!')
+    alert_placeholder.error(f'🚨 **DANGER:** High gas levels detected! Above {danger_threshold} ppm. Immediate action required!')
+else:
+    alert_placeholder.success(f'✅ All clear: Gas levels within safe range (≤ {danger_threshold} ppm).')
+
+# --- Alert History Sidebar ---
+if 'alert_history' not in st.session_state:
+    st.session_state.alert_history = []
+
+latest_time = latest_readings['timestamp'].iloc[0] if 'timestamp' in latest_readings else 'Unknown time'
+if (latest_readings.select_dtypes(include=[np.number]) > danger_threshold).any().any():
+    st.session_state.alert_history.append(f"🚨 Danger at {latest_time} — Gas above {danger_threshold} ppm")
+else:
+    st.session_state.alert_history.append(f"✅ Safe at {latest_time} — Gas within safe range")
+
+st.sidebar.title('Alert History')
+for alert in reversed(st.session_state.alert_history[-20:]):  # Show last 20 events
+    st.sidebar.write(alert)
+
 
 st.set_page_config(page_title="TPPR AI Demo", layout="wide")
 
