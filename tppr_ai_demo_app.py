@@ -99,7 +99,7 @@ def render_at_index(idx):
     tppr_alarm_rows = []
     for i, ch in enumerate(channels):
         ch_data = snapshot[snapshot['channel']==ch].copy()
-        ch_data = ch_data.set_index('timestamp').resample('1T').mean().ffill()
+        ch_data = ch_data.set_index('timestamp').resample('1T').mean(numeric_only=True).ffill()
         series = ch_data['gas_level_ppm']
         axs[i].plot(series.index, series.values)
         axs[i].set_title(f"Channel {ch} — {series.name if series.name else ''} {('('+str(ch)+')') if True else ''} — Threshold {thresholds[ch]} ppm")
